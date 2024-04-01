@@ -1,0 +1,112 @@
+parameters:
+  - name: environment
+    type: string
+    default: dev
+  - name: service_connection
+    type: string
+    default: sc_azure
+
+variables:
+  - group: terraform-base
+  - group: devops-base
+  - group: devops-non-prod
+  - group: devops-dev
+
+pool:
+  vmImage: ubuntu-22.04
+
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+      - main
+  paths:
+    exclude:
+      - terraform/**/*
+      - modules/**/*
+      - pipelines/infra_deploy_dev.yml
+      - pipelines/templates/**/*
+      - scripts/**/*
+
+stages:
+  - stage: chef
+    displayName: Chef Apply
+    jobs:
+      - deployment: chef_apply
+        displayName: Chef Apply
+        workspace:
+          clean: all
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: DownloadSecureFile@1
+                  name: idfile
+                  inputs:
+                    secureFile: id_rsa
+
+                - task: DownloadSecureFile@1
+                  name: pem
+                  inputs:
+                    secureFile: leriksen.pem
+
+                - task: DownloadSecureFile@1
+                  name: config
+                  inputs:
+                    secureFile: config.rb
+
+                - script: |
+                    mkdir -p /home/vsts/.ssh
+                    mkdir -p /home/vsts/.chef
+                    echo "StrictHostKeyChecking no" > /home/vsts/.ssh/config
+                    chmod 400 $(idfile.secureFilePath)
+                    cp -pR $(idfile.secureFilePath) /home/vsts/.ssh/
+                    cp -pR $(pem.secureFilePath) /home/vsts/.chef/
+                    cp -pR $(config.secureFilePath) /home/vsts/.chef/
+
+                    eval $(ssh-agent -s)
+                    ssh-add
+                  displayName: setup ssh
+
+#                - task: AzureCLI@2
+#                  displayName: get ip
+#                  name: ip
+#                  inputs:
+#                    azureSubscription: ${{ parameters.service_connection }}
+#                    scriptType: bash
+#                    scriptLocation: inlineScript
+#                    inlineScript: |
+#                      export fq=$(az network public-ip show -g azdo-agent -n public | jq -r '.ipAddress')
+#                      echo "fq is ${fq}"
+#                      echo "##vso[task.setvariable variable=fq;isOutput=true]${fq}"
+#
+                - script: |
+                    wget --quiet https://packages.chef.io/files/stable/chef-workstation/21.10.640/ubuntu/20.04/chef-workstation_21.10.640-1_amd64.deb
+                    sudo dpkg -i chef-workstation_21.10.640-1_amd64.deb
+                    echo "chef-client version == $(chef-client --version)"
+                  displayName: install knife
+
+                - task: Bash@3
+                  displayName: knife bootstrap
+                  inputs:
+                    targetType: inline
+                    script: |
+                      knife bootstrap adminuser@13.77.2.63 --config ~/.chef/config.rb -VVV --ssh-identity-file ~/.ssh/id_rsa --node-name ado --yes --sudo --chef-license accept-silent --ssh-verify-host-key never
+
+#                - task: Bash@3
+#                  displayName: rsync cookbooks
+#                  inputs:
+#                    targetType: inline
+#                    script: |
+#                      rsync -zavuh -e "ssh -i ~/.ssh/id_rsa" ./chef/cookbooks adminuser@13.77.2.63:~
+#
+#                - task: Bash@3
+#                  displayName: run cookbook
+#                  inputs:
+#                    targetType: inline
+#                    script: |
+#                      ssh adminuser@13.77.2.63 -i ~/.ssh/id_rsa "sudo chef-client -zr 'recipe[ado]'"

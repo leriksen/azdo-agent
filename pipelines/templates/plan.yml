@@ -1,0 +1,81 @@
+parameters:
+  - name: sa
+  - name: container
+  - name: project
+  - name: environment
+  - name: service_connection
+  - name: subscription_id
+  - name: id_file
+
+stages:
+  - stage: terraform_plan
+    displayName: Terraform Plan
+    jobs:
+      - job: terraform_plan
+        displayName: Terraform Plan
+        workspace:
+          clean: all
+        steps:
+          - task: AzureCLI@2
+            displayName: terraform init
+            inputs:
+              azureSubscription: ${{ parameters.service_connection }}
+              scriptType: bash
+              scriptLocation: scriptPath
+              scriptPath: scripts/terraform_init.sh
+              workingDirectory: $(System.DefaultWorkingDirectory)/terraform
+              addSpnToEnvironment: true
+              arguments: >
+                -backend-config="storage_account_name=${{ parameters.sa }}"
+                -backend-config="container_name=${{ parameters.container }}"
+                -backend-config="key=${{ parameters.project }}-${{ parameters.environment }}.tfstate"
+            env:
+              TF_IN_AUTOMATION: true
+              ARM_SUBSCRIPTION_ID: ${{ parameters.subscription_id }}
+              ARM_USE_AZUREAD: true
+
+          - task: DownloadSecureFile@1
+            name: idfile
+            inputs:
+              secureFile: ${{ parameters.id_file }}
+
+          - task: AzureCLI@2
+            displayName: terraform plan
+            name: plan # needed for result later
+            inputs:
+              azureSubscription: ${{ parameters.service_connection }}
+              scriptType: bash
+              scriptLocation: scriptPath
+              scriptPath: scripts/terraform_plan.sh
+              workingDirectory: $(System.DefaultWorkingDirectory)/terraform
+              addSpnToEnvironment: true
+              arguments: >
+                -out tfplan.tfout
+                -var "env=${{ parameters.environment }}"
+                -var "id_file=$(idfile.secureFilePath)"
+            env:
+              TF_IN_AUTOMATION: true
+              ARM_SUBSCRIPTION_ID: ${{ parameters.subscription_id }}
+              ARM_USE_AZUREAD: true
+
+          - task: CopyFiles@2
+            displayName: stage files to $(Build.StagingDirectory)
+            condition: and(succeeded(), eq(variables['plan.result'], 'changed'))
+            inputs:
+              sourceFolder: $(System.DefaultWorkingDirectory)
+              contents: |
+                terraform/**/*
+                modules/**/*
+                !scripts/**/*
+                !pipelines/**/*
+                !.gitignore
+                !**/.git/**/*
+                !terraform/.terraform/**/*
+              targetFolder: $(Build.StagingDirectory)
+              cleanTargetFolder: true
+          
+          - task: PublishBuildArtifacts@1
+            displayName: upload tf artifact
+            condition: and(succeeded(), eq(variables['plan.result'], 'changed'))
+            inputs:
+              artifactName: terraform-plan
