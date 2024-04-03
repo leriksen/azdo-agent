@@ -28,4 +28,6 @@ resource "azurerm_linux_virtual_machine" "ado" {
     sku       = "22_04-lts"
     version   = "latest"
   }
+
+  custom_data = filebase64("${path.module}/templates/agent_install.sh.tmpl")
 }

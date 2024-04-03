@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+mkdir -p /agent
+cd /agent
+
+curl -LO https://vstsagentpackage.azureedge.net/agent/3.236.1/vsts-agent-linux-x64-3.236.1.tar.gz
+tar zxvf vsts-agent-linux-x64-3.236.1.tar.gz
+
+su adminuser -l -c "cd /agent && ./config.sh --unattended --url 'https://dev.azure.com/leiferiksenau' --auth pat --acceptTeeEula --token 'replace' --pool 'ipam-devops' --agent 'agentname'" | tee install
+su adminuser -l -c "cd /agent && ./run.sh" | tee run
