@@ -1,0 +1,16 @@
+#cloud-config
+
+ssh_pwauth: false
+
+${customized_cloud_init_script}
+
+write_files:
+- encoding: base64
+  content: ${build_json_b64}
+  owner: 'root:root'
+  path: /var/build/build.json
+  permission: '0644'
+${customized_cloud_init_write_files_script}
+
+runcmd:
+${customized_cloud_init_runcmd_script}

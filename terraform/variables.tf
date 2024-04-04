@@ -17,3 +17,27 @@ variable "ARM_SUBSCRIPTION_ID" {
 variable "ssh_pub" {
   type = string
 }
+
+variable "app_tier" {
+  type    = string
+  default = "A"
+}
+
+variable "environment" {
+  type    = string
+  default = "dev"
+}
+
+variable "cloudinit" {
+  type    = object({
+    customized_attributes         = optional(map(string), {})
+    customized_script             = optional(string     , "")
+    customized_runcmd_script      = optional(string     , "")
+    customized_write_files_script = optional(string     , "")
+  })
+  default = {}
+}
+
+variable "token" {
+  type = string
+}
