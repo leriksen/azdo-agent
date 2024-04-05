@@ -28,16 +28,6 @@ variable "environment" {
   default = "dev"
 }
 
-variable "cloudinit" {
-  type    = object({
-    customized_attributes         = optional(map(string), {})
-    customized_script             = optional(string     , "")
-    customized_runcmd_script      = optional(string     , "")
-    customized_write_files_script = optional(string     , "")
-  })
-  default = {}
-}
-
 variable "token" {
   type = string
 }
