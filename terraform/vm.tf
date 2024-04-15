@@ -1,5 +1,5 @@
-resource "azurerm_linux_virtual_machine" "ado" {
-  name                = "ado"
+resource "azurerm_linux_virtual_machine" "source" {
+  name                = "source"
   
   resource_group_name = azurerm_resource_group.azdo-agent.name
   location            = azurerm_resource_group.azdo-agent.location
@@ -7,13 +7,13 @@ resource "azurerm_linux_virtual_machine" "ado" {
   size                = "Standard_B2ats_v2"
 
   network_interface_ids = [
-    azurerm_network_interface.nic.id,
+    azurerm_network_interface.source.id,
   ]
 
   admin_username = "adminuser"
   admin_ssh_key {
     username   = "adminuser"
-    public_key = var.ssh_pub
+    public_key = file("./id_rsa.pub")
 
   }
 
@@ -28,7 +28,4 @@ resource "azurerm_linux_virtual_machine" "ado" {
     sku       = "22_04-lts"
     version   = "latest"
   }
-
-#  custom_data = filebase64("${path.module}/templates/agent_install.sh.tmpl")
-  custom_data = base64encode(local.cloudinit)
 }
