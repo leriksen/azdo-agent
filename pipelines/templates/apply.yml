@@ -1,11 +1,5 @@
 parameters:
-  - name: sa
-  - name: container
   - name: environment
-  - name: project
-  - name: service_connection
-  - name: subscription_id
-  - name: id_file
 
 stages:
   - stage: terraform_apply
@@ -25,40 +19,21 @@ stages:
               steps:
                 - checkout: self
 
-                - task: DownloadSecureFile@1
-                  name: idfile
-                  inputs:
-                    secureFile: ${{ parameters.id_file }}
+#                - task: DownloadSecureFile@1
+#                  name: idfile
+#                  inputs:
+#                    secureFile: ${{ parameters.id_file }}
 
-                - task: AzureCLI@2
+                - task: Bash@3
                   displayName: terraform init
                   inputs:
-                    azureSubscription: ${{ parameters.service_connection }}
-                    scriptType: bash
-                    scriptLocation: scriptPath
-                    scriptPath: scripts/terraform_init.sh
+                    targetType: filePath
+                    filePath: scripts/terraform_init.sh
                     workingDirectory: $(Agent.BuildDirectory)/terraform-plan/terraform
-                    addSpnToEnvironment: true
-                    arguments: >
-                      -backend-config="storage_account_name=${{ parameters.sa }}"
-                      -backend-config="container_name=${{ parameters.container }}"
-                      -backend-config="key=${{ parameters.project }}-${{ parameters.environment }}.tfstate"
-                  env:
-                    TF_IN_AUTOMATION: true
-                    ARM_SUBSCRIPTION_ID: ${{ parameters.subscription_id }}
-                    ARM_USE_AZUREAD: true
 
-                - task: AzureCLI@2
+                - task: Bash@3
                   displayName: terraform apply
                   inputs:
-                    azureSubscription: ${{ parameters.service_connection }}
-                    scriptType: bash
-                    scriptLocation: scriptPath
-                    scriptPath: scripts/terraform_apply.sh
+                    targetType: filePath
+                    filePath: scripts/terraform_apply.sh
                     workingDirectory: $(Agent.BuildDirectory)/terraform-plan/terraform
-                    addSpnToEnvironment: true
-                  env:
-                    TF_IN_AUTOMATION: true
-                    ARM_SUBSCRIPTION_ID: ${{ parameters.subscription_id }}
-                    ARM_USE_AZUREAD: true
-
