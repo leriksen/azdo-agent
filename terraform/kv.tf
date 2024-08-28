@@ -7,10 +7,17 @@ resource "azurerm_key_vault" "kv" {
   enable_rbac_authorization  = true
   purge_protection_enabled   = false
   soft_delete_retention_days = 7
+  public_network_access_enabled = false
 }
 
 resource "azurerm_role_assignment" "kvsecretofficer" {
   principal_id = data.azurerm_client_config.current.object_id
+  scope = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets Officer"
+}
+
+resource "azurerm_role_assignment" "sckvsecretofficer" {
+  principal_id = "49089378-3b8e-4dbe-8b19-9f31d3c7645a"
   scope = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Secrets Officer"
 }
@@ -37,4 +44,22 @@ resource "azurerm_private_endpoint" "pe" {
       "vault"
     ]
   }
+  private_dns_zone_group {
+    name                 = "kve-dns-zone-group"
+    private_dns_zone_ids = [
+      azurerm_private_dns_zone.privdns.id
+    ]
+  }
 }
+
+resource "azurerm_private_dns_zone" "privdns" {
+  name                = "privatelink.vaultcore.azure.net"
+  resource_group_name = azurerm_resource_group.azdo-agent.name
+}
+
+#resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_link" {
+#  name                  = "kv-link"
+#  resource_group_name   = azurerm_resource_group.azdo-agent.name
+#  private_dns_zone_name = azurerm_private_dns_zone.privdns.name
+#  virtual_network_id    = azurerm_virtual_network.vnet.id
+#}
