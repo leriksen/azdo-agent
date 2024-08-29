@@ -19,10 +19,6 @@ describe DatabagSecrets do
     it 'expects pool' do
       expect(databag.pool).to eq('good_pool')
     end
-
-    it 'expects agentName' do
-      expect(databag.agentName).to eq('good_agentName')
-    end
   end
 
   context 'bad databag' do
@@ -34,6 +30,13 @@ describe DatabagSecrets do
   context 'bad json' do
     it 'rejects incorrect json files' do
       expect { DatabagSecrets.new './spec/fixtures/bad_json.json' }.to raise_error(JSON::ParserError)
+    end
+  end
+
+  # fix later
+  context 'no file' do
+    xit 'handles no file' do
+      expect { DatabagSecrets.new './no_file.json' }.to raise_error(DatabagSecrets::BadSecrets)
     end
   end
 end

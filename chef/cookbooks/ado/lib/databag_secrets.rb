@@ -6,8 +6,7 @@ class DatabagSecrets
 
     if !@data.key?('pat')          ||
        !@data.key?('organization') ||
-       !@data.key?('pool')         ||
-       !@data.key?('agentName')
+       !@data.key?('pool')
       raise DatabagSecrets::BadSecrets, "#{secret_file} is missing required fields"
     end
   end
@@ -22,10 +21,6 @@ class DatabagSecrets
 
   def pool
     @data['pool']
-  end
-
-  def agentName
-    @data['agentName']
   end
 
   class BadSecrets < StandardError
