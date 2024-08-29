@@ -32,7 +32,13 @@ describe "ado::ado" do
       it { is_expected.to write_log('packager     is dnf') }
     end
 
-    packages = %w(apt-transport-https ca-certificates curl gpg)
+    packages = %w(
+      apt-transport-https
+      ca-certificates
+      curl
+      gpg
+      podman
+    )
     packages.each do |package|
       describe "installs #{package} package" do
 

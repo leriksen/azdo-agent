@@ -15,6 +15,7 @@ package "apt-transport-https"
 package "ca-certificates"
 package "curl"
 package "gpg"
+package "podman"
 
 directory "#{node['ado-agent']['agent-download']}"
 directory "#{node['ado-agent']['agent-install']}"
