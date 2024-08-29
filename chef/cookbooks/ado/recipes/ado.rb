@@ -34,7 +34,6 @@ else
   databag      = data_bag_item("#node['ado-agent']['databag']", "#{node['ado-agent']['databagitem']}")
 end
 
-log "pat          = #{databag.pat}"
 log "organization = #{databag.organization}"
 log "pool         = #{databag.pool}"
 

@@ -69,7 +69,6 @@ describe "ado::ado" do
 
     describe 'logs databag' do
       it { is_expected.to write_log("databag object is created")}
-      it { is_expected.to write_log("pat          = good_pat"         )}
       it { is_expected.to write_log("organization = good_organization")}
       it { is_expected.to write_log("pool         = good_pool"        )}
     end
