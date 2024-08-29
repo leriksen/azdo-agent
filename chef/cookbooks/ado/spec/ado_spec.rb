@@ -68,7 +68,7 @@ describe "ado::ado" do
     end
 
     describe 'logs databag' do
-      it { is_expected.to write_log("databag_object is created")}
+      it { is_expected.to write_log("databag object is created")}
       it { is_expected.to write_log("pat          = good_pat"         )}
       it { is_expected.to write_log("organization = good_organization")}
       it { is_expected.to write_log("pool         = good_pool"        )}
@@ -88,5 +88,10 @@ describe "ado::ado" do
       ) }
     end
   end
+
+  context 'with databag' do
+    # do these later
+  end
+
 end
 

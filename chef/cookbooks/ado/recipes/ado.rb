@@ -27,7 +27,7 @@ execute 'get-ado-linux-agent' do
 end
 
 if File.exist? "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets_file']}"
-  log "databag_object is created"
+  log "databag object is created"
   databag      = DatabagSecrets.new "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets_file']}"
 else
   log "native databag is created"
