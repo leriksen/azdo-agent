@@ -10,8 +10,8 @@ package "gpg"
 directory "/agent"
 
 execute 'get-ado-linux-agent' do
-  command "curl -LO https://vstsagentpackage.azureedge.net/agent/3.236.1/vsts-agent-linux-x64-3.236.1.tar.gz && \
-  tar zxvf vsts-agent-linux-x64-3.236.1.tar.gz"
+  command "curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz && \
+  tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz"
   cwd '/agent'
 end
 
@@ -19,7 +19,7 @@ execute 'install-ado-agent' do
   command "./config.sh \
     --unattended \
     --url 'https://dev.azure.com/leiferiksenau' \
-    --auth alt \
+    --auth pat \
     --acceptTeeEula \
     --userName 'here' \
     --password 'there'
