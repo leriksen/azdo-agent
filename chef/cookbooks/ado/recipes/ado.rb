@@ -37,7 +37,22 @@ end
 log "organization = #{databag.organization}"
 log "pool         = #{databag.pool}"
 
-execute 'install-ado-agent' do
+# might have an already running agent
+# stop, remove then reconfigure
+execute 'unconfigure-ado-agent' do
+  command [
+    "./config.sh",
+    "remove",
+    "--unattended",
+    "--auth pat",
+    "--token #{databag.pat}"
+  ].join(" ")
+  cwd "#{node['ado-agent']['agent-install']}"
+  returns [0, 1] # allow fail
+  user node['ado-agent']['agent-user']
+end
+
+execute 'configure-ado-agent' do
   command [
     "./config.sh",
     "--unattended",
@@ -50,12 +65,20 @@ execute 'install-ado-agent' do
     "--replace"
   ].join(" ")
   cwd "#{node['ado-agent']['agent-install']}"
-  user 'adminuser'
+  user node['ado-agent']['agent-user']
 end
 
-# replace with svc creation later
-execute 'run-ado-agent' do
-  command "./run.sh"
+execute 'install-ado-agent-svc' do
+  command "./svc.sh install"
   cwd "#{node['ado-agent']['agent-install']}"
-  user 'adminuser'
+end
+
+execute 'start-ado-agent-svc' do
+  command "./svc.sh start"
+  cwd "#{node['ado-agent']['agent-install']}"
+end
+
+execute 'status-ado-agent-svc' do
+  command "./svc.sh status"
+  cwd "#{node['ado-agent']['agent-install']}"
 end

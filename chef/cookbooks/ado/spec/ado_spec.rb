@@ -7,6 +7,7 @@ describe "ado::ado" do
   context 'with secrets file' do
     override_attributes['ado-agent']['secrets_dir']  = './spec/fixtures'
     override_attributes['ado-agent']['secrets_file'] = 'good_databag.json'
+    override_attributes['ado-agent']['agent-user']   = 'adminuser'
 
     describe 'check overrides' do
       it { is_expected.to write_log("secrets_dir  is ./spec/fixtures") }
@@ -61,10 +62,12 @@ describe "ado::ado" do
     end
 
     describe 'executes the get-ado-linux-agent' do
-      it { is_expected.to run_execute('get-ado-linux-agent').with(
-        cwd:     '/var/local/agent-download',
-        command: 'curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz &&   tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz --directory /opt/ado-agent'
-      ) }
+      it {
+        is_expected.to run_execute('get-ado-linux-agent').with(
+          cwd:     '/var/local/agent-download',
+          command: 'curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz &&   tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz --directory /opt/ado-agent'
+        )
+      }
     end
 
     describe 'logs databag' do
@@ -73,28 +76,66 @@ describe "ado::ado" do
       it { is_expected.to write_log("pool         = good_pool"        )}
     end
 
-    describe 'executes the install-ado-agent' do
-      it { is_expected.to run_execute('install-ado-agent').with(
-        cwd:     '/opt/ado-agent',
-        command: [
-          "./config.sh",
-          "--unattended",
-          "--url good_organization",
-          "--auth pat",
-          "--token good_pat",
-          "--acceptTeeEula",
-          "--pool good_pool",
-          "--agent Fauxhai",
-          "--replace"
-        ].join(" ")
+    describe 'executes the unconfigure-ado-agent' do
+      it {
+        is_expected.to run_execute('unconfigure-ado-agent').with(
+          user: 'adminuser',
+          cwd:  '/opt/ado-agent',
+          command: [
+            "./config.sh",
+            "remove",
+            "--unattended",
+            "--auth pat",
+            "--token good_pat"
+          ].join(" ")
+        )
+      }
+    end
+
+    describe 'executes the configure-ado-agent' do
+      it {
+        is_expected.to run_execute('configure-ado-agent').with(
+          user: 'adminuser',
+          cwd:  '/opt/ado-agent',
+          command: [
+            "./config.sh",
+            "--unattended",
+            "--url good_organization",
+            "--auth pat",
+            "--token good_pat",
+            "--acceptTeeEula",
+            "--pool good_pool",
+            "--agent Fauxhai",
+            "--replace"
+          ].join(" ")
+        )
+      }
+    end
+
+    describe 'executes the install-ado-agent-svc' do
+      it {
+        is_expected.to run_execute('install-ado-agent-svc').with(
+          user: 'adminuser',
+          cwd:  '/opt/ado-agent',
+          command: './svc.sh install'
+        )
+      }
+    end
+
+    describe 'executes the start-ado-agent-svc' do
+      it { is_expected.to run_execute('start-ado-agent-svc').with(
+        cwd: '/opt/ado-agent',
+        command: './svc.sh start'
       ) }
     end
 
-    describe 'executes the run-ado-agent' do
-      it { is_expected.to run_execute('run-ado-agent').with(
-        cwd:     '/opt/ado-agent',
-        command: "./run.sh"
-      ) }
+    describe 'executes the status-ado-agent-svc' do
+      it {
+        is_expected.to run_execute('status-ado-agent-svc').with(
+          cwd:     '/opt/ado-agent',
+          command: './svc.sh status'
+        )
+      }
     end
   end
 

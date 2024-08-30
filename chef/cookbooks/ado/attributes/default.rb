@@ -4,6 +4,7 @@ default['ado-agent']['databag']        = 'ado_db_ado_agent'
 default['ado-agent']['databagitem']    = 'ado-prd-secrets'
 default['ado-agent']['agent-download'] = '/var/local/agent-download'
 default['ado-agent']['agent-install']  = '/opt/ado-agent'
+default['ado-agent']['agent-user']     = 'adminuser'
 
 case node['platform_family']
 when 'debian'
