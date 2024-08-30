@@ -76,7 +76,17 @@ describe "ado::ado" do
     describe 'executes the install-ado-agent' do
       it { is_expected.to run_execute('install-ado-agent').with(
         cwd:     '/opt/ado-agent',
-        command: "./config.sh     --unattended     --url good_organization     --auth pat     --token good_pat     --acceptTeeEula     --pool good_pool     --agent Fauxhai"
+        command: [
+          "./config.sh",
+          "--unattended",
+          "--url good_organization",
+          "--auth pat",
+          "--token good_pat",
+          "--acceptTeeEula",
+          "--pool good_pool",
+          "--agent Fauxhai",
+          "--replace"
+        ].join(" ")
       ) }
     end
 

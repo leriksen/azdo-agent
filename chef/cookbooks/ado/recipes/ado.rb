@@ -38,19 +38,24 @@ log "organization = #{databag.organization}"
 log "pool         = #{databag.pool}"
 
 execute 'install-ado-agent' do
-  command "./config.sh \
-    --unattended \
-    --url #{databag.organization} \
-    --auth pat \
-    --token #{databag.pat} \
-    --acceptTeeEula \
-    --pool #{databag.pool} \
-    --agent #{node['hostname']}"
+  command [
+    "./config.sh",
+    "--unattended",
+    "--url #{databag.organization}",
+    "--auth pat",
+    "--token #{databag.pat}",
+    "--acceptTeeEula",
+    "--pool #{databag.pool}",
+    "--agent #{node['hostname']}",
+    "--replace"
+  ].join(" ")
   cwd "#{node['ado-agent']['agent-install']}"
+  user 'adminuser'
 end
 
 # replace with svc creation later
 execute 'run-ado-agent' do
   command "./run.sh"
   cwd "#{node['ado-agent']['agent-install']}"
+  user 'adminuser'
 end
