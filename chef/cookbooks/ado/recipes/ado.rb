@@ -77,8 +77,3 @@ execute 'start-ado-agent-svc' do
   command "./svc.sh start"
   cwd "#{node['ado-agent']['agent-install']}"
 end
-
-execute 'status-ado-agent-svc' do
-  command "./svc.sh status"
-  cwd "#{node['ado-agent']['agent-install']}"
-end
