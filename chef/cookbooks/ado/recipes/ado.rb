@@ -21,8 +21,20 @@ directory "#{node['ado-agent']['agent-download']}"
 directory "#{node['ado-agent']['agent-install']}"
 
 execute 'get-ado-linux-agent' do
-  command "curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz && \
-  tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz --directory #{node['ado-agent']['agent-install']}"
+  command [
+    "curl -LO #{node['ado_agent']['vsts_url']}",
+    "tar zxvf #{node['ado_agent']['vsts_file']} --directory #{node['ado-agent']['agent-install']}"
+  ].join(';')
+  cwd "#{node['ado-agent']['agent-download']}"
+end
+
+execute 'get-powershell-core' do
+  command "curl -LO #{node['pwsh_url']}"
+  cwd "#{node['ado-agent']['agent-download']}"
+end
+
+execute 'install-powershell-core' do
+  command "#{node['installer']} -i #{node['pwsh_file']}"
   cwd "#{node['ado-agent']['agent-download']}"
 end
 
@@ -31,7 +43,7 @@ if File.exist? "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets
   databag      = DatabagSecrets.new "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets_file']}"
 else
   log "native databag is created"
-  databag      = data_bag_item("#node['ado-agent']['databag']", "#{node['ado-agent']['databagitem']}")
+  databag      = data_bag_item("#{node['ado-agent']['databag']}", "#{node['ado-agent']['databagitem']}")
 end
 
 log "organization = #{databag.organization}"
