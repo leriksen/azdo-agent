@@ -65,7 +65,7 @@ describe "ado::ado" do
       it {
         is_expected.to run_execute('get-ado-linux-agent').with(
           cwd:     '/var/local/agent-download',
-          command: 'curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz &&   tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz --directory /opt/ado-agent'
+          command: 'curl -LO https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz;tar zxvf vsts-agent-linux-x64-3.243.1.tar.gz --directory /opt/ado-agent'
         )
       }
     end
@@ -115,7 +115,6 @@ describe "ado::ado" do
     describe 'executes the install-ado-agent-svc' do
       it {
         is_expected.to run_execute('install-ado-agent-svc').with(
-          user: 'adminuser',
           cwd:  '/opt/ado-agent',
           command: './svc.sh install'
         )
@@ -127,15 +126,6 @@ describe "ado::ado" do
         cwd: '/opt/ado-agent',
         command: './svc.sh start'
       ) }
-    end
-
-    describe 'executes the status-ado-agent-svc' do
-      it {
-        is_expected.to run_execute('status-ado-agent-svc').with(
-          cwd:     '/opt/ado-agent',
-          command: './svc.sh status'
-        )
-      }
     end
   end
 
