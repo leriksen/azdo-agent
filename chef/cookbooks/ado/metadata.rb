@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'ado'
 maintainer 'Leif Eriksen'
 maintainer_email 'leif.eriksen.au+ado@gmail.com'

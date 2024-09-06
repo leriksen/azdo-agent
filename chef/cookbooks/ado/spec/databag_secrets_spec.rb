@@ -1,29 +1,24 @@
+# frozen_string_literal: true
+
 require './lib/databag_secrets'
 
 describe DatabagSecrets do
   context 'good databag' do
     databag = DatabagSecrets.new './spec/fixtures/good_databag.json'
 
-    it 'builds a new instance' do
-      expect(databag).to be_an_instance_of(DatabagSecrets)
-    end
-
-    it 'expects pat' do
-      expect(databag.pat).to eq('good_pat')
-    end
-
-    it 'expects organization' do
-      expect(databag.organization).to eq('good_organization')
-    end
-
-    it 'expects pool' do
-      expect(databag.pool).to eq('good_pool')
+    context 'hash' do
+      it 'handles a key' do
+        expect(databag['organization']).to eq('good_organization')
+      end
     end
   end
 
   context 'bad databag' do
     it 'rejects incorrect databag secret files' do
-      expect { DatabagSecrets.new './spec/fixtures/bad_databag.json' }.to raise_error(DatabagSecrets::BadSecrets, './spec/fixtures/bad_databag.json is missing required fields')
+      expect do
+        DatabagSecrets.new './spec/fixtures/bad_databag.json'
+      end.to raise_error(DatabagSecrets::BadSecrets,
+                         './spec/fixtures/bad_databag.json is missing required fields')
     end
   end
 

@@ -1,5 +1,7 @@
 {
   "pat": "good_pat",
   "organization": "good_organization",
-  "pool": "good_pool"
+  "pool": "good_pool",
+  "user": "good_user",
+  "password": "good_password"
 }

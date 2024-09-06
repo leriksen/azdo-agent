@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 default['ado-agent']['secrets_dir']    = '/var/data/ado-agent'
 default['ado-agent']['secrets_file']   = 'ado.json'
 default['ado-agent']['databag']        = 'ado_db_ado_agent'

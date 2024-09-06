@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 class DatabagSecrets
@@ -6,25 +8,19 @@ class DatabagSecrets
 
     if !@data.key?('pat')          ||
        !@data.key?('organization') ||
-       !@data.key?('pool')
+       !@data.key?('pool')         ||
+       !@data.key?('user')         ||
+       !@data.key?('password')
       raise DatabagSecrets::BadSecrets, "#{secret_file} is missing required fields"
     end
   end
 
-  def pat
-    @data['pat']
-  end
-
-  def organization
-    @data['organization']
-  end
-
-  def pool
-    @data['pool']
+  def [](key)
+    @data[key]
   end
 
   class BadSecrets < StandardError
-    def initialize(message = "Bad secret config json file")
+    def initialize(message = 'Bad secret config json file')
       super
     end
   end
