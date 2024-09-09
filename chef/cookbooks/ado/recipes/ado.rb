@@ -9,15 +9,15 @@ log "secrets_file is #{node['ado-agent']['secrets_file']}"
 log "databag      is #{node['ado-agent']['databag']}"
 log "databagitem  is #{node['ado-agent']['databagitem']}"
 
-execute 'package-update' do
-  command 'apt-get update --yes'
-end
+# execute 'package-update' do
+#   command "#{node['packager']} upgrade --assumeyes"
+# end
 
-package 'apt-transport-https'
+# package 'apt-transport-https'
 package 'ca-certificates'
 package 'curl'
 package 'gpg'
-package 'podman'
+# package 'podman'
 
 directory (node['ado-agent']['agent-download']).to_s
 
@@ -34,7 +34,7 @@ execute 'get-powershell-core' do
 end
 
 execute 'install-powershell-core' do
-  command "#{node['installer']} -i #{node['pwsh_file']}"
+  command "#{node['installer']} install #{node['pwsh_file']} --assumeyes"
   cwd (node['ado-agent']['agent-download']).to_s
   creates '/usr/bin/pwsh'
 end

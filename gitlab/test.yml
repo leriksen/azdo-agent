@@ -1,0 +1,9 @@
+pool:
+  vmImage: ubuntu-22.04
+
+resources:
+  repositories:
+    - repository: gitlab
+      endpoint: gitlab
+      name: default3161437/default
+      type: git

@@ -4,7 +4,7 @@ resource "azurerm_linux_virtual_machine" "ado" {
   resource_group_name = azurerm_resource_group.azdo-agent.name
   location            = azurerm_resource_group.azdo-agent.location
   
-  size                = "Standard_B2ats_v2"
+  size                = "Standard_DS2_v2"
 
   network_interface_ids = [
     azurerm_network_interface.nic.id,

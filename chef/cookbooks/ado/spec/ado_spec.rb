@@ -36,11 +36,9 @@ describe 'ado::ado' do
     end
 
     packages = %w[
-      apt-transport-https
       ca-certificates
       curl
       gpg
-      podman
     ]
     packages.each do |package|
       describe "installs #{package} package" do
@@ -158,7 +156,6 @@ describe 'ado::ado' do
       it { is_expected.to write_log('user         = databag_user') }
     end
     packages = %w[
-      apt-transport-https
       ca-certificates
       curl
       gpg
