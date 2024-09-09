@@ -7,3 +7,4 @@ resources:
       endpoint: gitlab
       name: default3161437/default
       type: git
+      ref: master
