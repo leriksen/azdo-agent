@@ -94,6 +94,8 @@ execute 'unpack-ado-linux-agent' do
   cwd (node['ado-agent']['agent-download']).to_s
 end
 
+user node['ado-agent']['agent-user']
+
 execute 'configure-ado-agent' do
   command [
     './config.sh',

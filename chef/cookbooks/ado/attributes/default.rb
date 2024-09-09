@@ -6,7 +6,7 @@ default['ado-agent']['databag']        = 'ado_db_ado_agent'
 default['ado-agent']['databagitem']    = 'ado-prd-secrets'
 default['ado-agent']['agent-download'] = '/var/local/agent-download'
 default['ado-agent']['agent-install']  = '/opt/ado-agent'
-default['ado-agent']['agent-user']     = 'adminuser'
+default['ado-agent']['agent-user']     = 'ado-agent'
 default['ado_agent']['vsts_url']       = 'https://vstsagentpackage.azureedge.net/agent/3.243.1/vsts-agent-linux-x64-3.243.1.tar.gz'
 default['ado_agent']['vsts_file']      = 'vsts-agent-linux-x64-3.243.1.tar.gz'
 

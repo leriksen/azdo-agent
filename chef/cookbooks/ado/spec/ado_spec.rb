@@ -159,7 +159,6 @@ describe 'ado::ado' do
       ca-certificates
       curl
       gpg
-      podman
     ]
     packages.each do |package|
       describe "installs #{package} package" do
@@ -189,7 +188,7 @@ describe 'ado::ado' do
     describe 'executes the unconfigure-ado-agent' do
       it {
         is_expected.to run_execute('unconfigure-ado-agent').with(
-          user: 'adminuser',
+          user: 'ado-agent',
           cwd: '/opt/ado-agent',
           command: [
             './config.sh',
@@ -205,7 +204,7 @@ describe 'ado::ado' do
     describe 'executes the configure-ado-agent' do
       it {
         is_expected.to run_execute('configure-ado-agent').with(
-          user: 'adminuser',
+          user: 'ado-agent',
           cwd: '/opt/ado-agent',
           command: [
             './config.sh',
