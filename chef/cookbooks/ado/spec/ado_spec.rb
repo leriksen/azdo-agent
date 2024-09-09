@@ -9,7 +9,7 @@ describe 'ado::ado' do
   context 'with secrets file' do
     override_attributes['ado-agent']['secrets_dir']  = './spec/fixtures'
     override_attributes['ado-agent']['secrets_file'] = 'good_databag.json'
-    override_attributes['ado-agent']['agent-user']   = 'adminuser'
+    override_attributes['ado-agent']['agent-user']   = 'ado-agent'
 
     describe 'check overrides' do
       it { is_expected.to write_log('secrets_dir  is ./spec/fixtures') }
@@ -79,7 +79,7 @@ describe 'ado::ado' do
     describe 'executes the unconfigure-ado-agent' do
       it {
         is_expected.to run_execute('unconfigure-ado-agent').with(
-          user: 'adminuser',
+          user: 'ado-agent',
           cwd: '/opt/ado-agent',
           command: [
             './config.sh',
@@ -95,7 +95,7 @@ describe 'ado::ado' do
     describe 'executes the configure-ado-agent' do
       it {
         is_expected.to run_execute('configure-ado-agent').with(
-          user: 'adminuser',
+          user: 'ado-agent',
           cwd: '/opt/ado-agent',
           command: [
             './config.sh',
@@ -116,7 +116,7 @@ describe 'ado::ado' do
       it {
         is_expected.to run_execute('install-ado-agent-svc').with(
           cwd: '/opt/ado-agent',
-          command: './svc.sh install'
+          command: './svc.sh install ado-agent'
         )
       }
     end
@@ -225,7 +225,7 @@ describe 'ado::ado' do
       it {
         is_expected.to run_execute('install-ado-agent-svc').with(
           cwd: '/opt/ado-agent',
-          command: './svc.sh install'
+          command: './svc.sh install ado-agent'
         )
       }
     end

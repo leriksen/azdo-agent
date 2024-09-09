@@ -24,7 +24,6 @@ directory (node['ado-agent']['agent-download']).to_s
 execute 'get-ado-linux-agent' do
   command "curl -LO #{node['ado_agent']['vsts_url']}"
   cwd (node['ado-agent']['agent-download']).to_s
-  creates node['ado_agent']['vsts_file']
 end
 
 execute 'get-powershell-core' do
@@ -85,16 +84,29 @@ directory (node['ado-agent']['agent-install']).to_s do
   recursive true
 end
 
-directory (node['ado-agent']['agent-install']).to_s
+user node['ado-agent']['agent-user']
+
+directory (node['ado-agent']['agent-install']).to_s do
+  mode '0775'
+  owner node['ado-agent']['agent-user']
+  group node['ado-agent']['agent-user']
+  recursive true
+end
 
 execute 'unpack-ado-linux-agent' do
   command [
     "tar zxvf #{node['ado_agent']['vsts_file']} --directory #{node['ado-agent']['agent-install']}"
   ].join(';')
   cwd (node['ado-agent']['agent-download']).to_s
+  user node['ado-agent']['agent-user']
 end
 
-user node['ado-agent']['agent-user']
+# directory (node['ado-agent']['agent-install']).to_s do
+#   mode '0775'
+#   owner node['ado-agent']['agent-user']
+#   group node['ado-agent']['agent-user']
+#   recursive true
+# end
 
 execute 'configure-ado-agent' do
   command [
@@ -113,7 +125,7 @@ execute 'configure-ado-agent' do
 end
 
 execute 'install-ado-agent-svc' do
-  command './svc.sh install'
+  command "./svc.sh install #{node['ado-agent']['agent-user']}"
   cwd (node['ado-agent']['agent-install']).to_s
 end
 
