@@ -36,6 +36,6 @@ resource "azurerm_linux_virtual_machine" "ado" {
     version   = "latest"
   }
 
-  #  custom_data = filebase64("${path.module}/templates/agent_install.sh.tmpl")
-  custom_data = base64encode(local.cloudinit)
+  # custom_data = filebase64("${path.module}/templates/agent_install.sh.tmpl")
+  # custom_data = base64encode(local.cloudinit)
 }
