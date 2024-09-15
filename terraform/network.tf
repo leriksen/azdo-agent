@@ -21,6 +21,7 @@ resource "azurerm_public_ip" "ip" {
   location            = azurerm_resource_group.azdo-agent.location
   name                = "public"
   resource_group_name = azurerm_resource_group.azdo-agent.name
+  domain_name_label   = "ado"
 }
 
 resource "azurerm_network_interface" "nic" {

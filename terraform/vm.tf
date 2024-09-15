@@ -1,5 +1,5 @@
 resource "azurerm_linux_virtual_machine" "ado" {
-  name                = "ado"
+  name                = azurerm_public_ip.ip.domain_name_label
   
   resource_group_name = azurerm_resource_group.azdo-agent.name
   location            = azurerm_resource_group.azdo-agent.location
