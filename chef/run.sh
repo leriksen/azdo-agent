@@ -1,6 +1,5 @@
-export fq=$(az network public-ip show -g azdo-agent -n public | jq -r '.ipAddress')
-echo "${fq}"
-knife bootstrap "adminuser@${fq}" --node-name ado --ssh-identity-file ~/.ssh/id_rsa --yes --sudo
-rsync -zavuh -e ssh ./cookbooks "adminuser@${fq}":~
-ssh "adminuser@${fq}" -i ~/.ssh/id_rsa "sudo mkdir -p /var/data/ado-agent; sudo cp cookbooks/ado/databags/ado.json /var/data/ado-agent/ado.json"
-ssh "adminuser@${fq}" -i ~/.ssh/id_rsa "sudo chef-client -zr 'recipe[ado]'"
+knife bootstrap "adminuser@ado.australiasoutheast.cloudapp.azure.com" --node-name ado --ssh-identity-file ~/.ssh/id_rsa --yes --sudo
+rsync -zavuh -e ssh ./cookbooks "adminuser@ado.australiasoutheast.cloudapp.azure.com":~
+ssh "adminuser@ado.australiasoutheast.cloudapp.azure.com" -i ~/.ssh/id_rsa "sudo mkdir -p /var/data/ado-agent; sudo chmod 777 /var/data/ado-agent"
+rsync -zavuh -e ssh ./cookbooks/ado/databags/ado.json "adminuser@ado.australiasoutheast.cloudapp.azure.com":/var/data/ado-agent/ado.json
+ssh "adminuser@ado.australiasoutheast.cloudapp.azure.com" -i ~/.ssh/id_rsa "sudo chef-client -zr 'recipe[ado]'"
