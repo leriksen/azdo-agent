@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+frozen_string_literal: true
 
 require_relative '../lib/databag_secrets'
 
@@ -84,7 +84,17 @@ directory (node['ado-agent']['agent-install']).to_s do
   recursive true
 end
 
-user node['ado-agent']['agent-user']
+# cleanup for a previous error
+user 'ado-agent' do
+  action :remove
+end
+
+# restore
+user 'ado-agent' do
+  home '/home/ado-agent'
+  manage_home true
+  action :create
+end
 
 directory (node['ado-agent']['agent-install']).to_s do
   mode '0775'
