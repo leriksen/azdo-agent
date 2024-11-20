@@ -1,4 +1,4 @@
-frozen_string_literal: true
+# frozen_string_literal: true
 
 require_relative '../lib/databag_secrets'
 
@@ -17,7 +17,8 @@ log "databagitem  is #{node['ado-agent']['databagitem']}"
 package 'ca-certificates'
 package 'curl'
 package 'gpg'
-# package 'podman'
+package 'podman'
+# package 'cntlm'
 
 directory (node['ado-agent']['agent-download']).to_s
 
@@ -25,6 +26,7 @@ execute 'get-ado-linux-agent' do
   command "curl -LO #{node['ado_agent']['vsts_url']}"
   cwd (node['ado-agent']['agent-download']).to_s
 end
+
 
 execute 'get-powershell-core' do
   command "curl -LO #{node['pwsh_url']}"
@@ -38,6 +40,15 @@ execute 'install-powershell-core' do
   creates '/usr/bin/pwsh'
 end
 
+file '/opt/microsoft/powershell/7/profile.ps1' do
+  content <<-EOF
+    $env:http_proxy  = 'http://localhost:3128'
+    $env:https_proxy = 'http://localhost:3128'
+  EOF
+  mode '0755'
+  action :create_if_missing
+end
+
 if File.exist? "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets_file']}"
   log 'databag object is created'
   databag = DatabagSecrets.new "#{node['ado-agent']['secrets_dir']}/#{node['ado-agent']['secrets_file']}"
@@ -49,6 +60,7 @@ end
 log "organization = #{databag['organization']}"
 log "pool         = #{databag['pool']}"
 log "user         = #{databag['user']}"
+log "thing        = #{databag['thing']}"
 
 # might have an already running agent
 # stop, remove then reconfigure

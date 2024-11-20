@@ -1,0 +1,7 @@
+pool: ipam-devops
+
+steps:
+	- script: |
+		ls -al
+		uname -a
+	  displayName: Test Shell
