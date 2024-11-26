@@ -166,6 +166,7 @@ execute 'install-authV2-extension' do
     "#{node['ado-agent']['agent-download']}/#{node['authV2_file']}"
   ].join(' ')
   cwd (node['ado-agent']['agent-download']).to_s
+  creates '/usr/lib/python3.6/site-packages/azure-cli-extensions/authV2'
 end
 
 execute 'configure-ado-agent' do
