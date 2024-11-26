@@ -8,7 +8,7 @@ default['ado-agent']['agent-download'] = '/var/local/agent-download'
 default['ado-agent']['agent-install']  = '/opt/ado-agent'
 default['ado-agent']['agent-user']     = 'ado-agent'
 default['ado_agent']['vsts_url']       = 'https://vstsagentpackage.azureedge.net/agent/4.248.0/vsts-agent-linux-x64-4.248.0.tar.gz'
-default['ado_agent']['vsts_file']      = 'vsts-agent-linux-x64-3.243.1.tar.gz'
+default['ado_agent']['vsts_file']      = 'vsts-agent-linux-x64-4.248.0.tar.gz'
 
 case node['platform_family']
 when 'debian'

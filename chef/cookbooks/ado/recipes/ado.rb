@@ -133,12 +133,12 @@ execute 'unpack-ado-linux-agent' do
   user node['ado-agent']['agent-user']
 end
 
-# directory (node['ado-agent']['agent-install']).to_s do
-#   mode '0775'
-#   owner node['ado-agent']['agent-user']
-#   group node['ado-agent']['agent-user']
-#   recursive true
-# end
+directory (node['ado-agent']['agent-install']).to_s do
+  mode '0775'
+  owner node['ado-agent']['agent-user']
+  group node['ado-agent']['agent-user']
+  recursive true
+end
 
 remote_file "#{node['ado-agent']['agent-download']}/#{node['azcli_file']}" do
   source node['azcli_url']
@@ -153,6 +153,54 @@ end
 remote_file "#{node['ado-agent']['agent-download']}/#{node['authV2_file']}" do
   source node['authV2_url']
   action :create
+end
+
+# cleanup authV2 previous install variants
+execute 'uninstall-authV2-extension-user' do
+  command [
+    'az',
+    'extension',
+    'remove',
+    '--yes',
+    '--name',
+    'authV2'
+  ].join(' ')
+  cwd (node['ado-agent']['agent-download']).to_s
+  user node['ado-agent']['agent-user']
+  ignore_failure true
+end
+
+execute 'uninstall-authV2-extension-root' do
+  command [
+    'az',
+    'extension',
+    'add',
+    '--yes',
+    '--name',
+    'authV2'
+  ].join(' ')
+  cwd (node['ado-agent']['agent-download']).to_s
+  ignore_failure true
+end
+
+execute 'uninstall-authV2-extension-system' do
+  command [
+    'az',
+    'extension',
+    'add',
+    '--yes',
+    '--system',
+    '--name',
+    'authV2'
+  ].join(' ')
+  cwd (node['ado-agent']['agent-download']).to_s
+  ignore_failure true
+end
+
+directory '/root/.azure/cliextensions/authV2' do
+  action :delete
+  recursive true
+  ignore_failure true
 end
 
 execute 'install-authV2-extension' do
