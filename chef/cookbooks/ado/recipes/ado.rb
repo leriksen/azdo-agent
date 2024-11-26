@@ -18,6 +18,7 @@ package 'ca-certificates'
 package 'curl'
 package 'gpg'
 package 'podman'
+package 'git'
 # package 'cntlm'
 
 directory (node['ado-agent']['agent-download']).to_s
@@ -41,6 +42,15 @@ execute 'install-powershell-core' do
 end
 
 file '/opt/microsoft/powershell/7/profile.ps1' do
+  content <<-EOF
+    $env:http_proxy  = 'http://localhost:3128'
+    $env:https_proxy = 'http://localhost:3128'
+  EOF
+  mode '0755'
+  action :create_if_missing
+end
+
+file '/etc/bashrc' do
   content <<-EOF
     $env:http_proxy  = 'http://localhost:3128'
     $env:https_proxy = 'http://localhost:3128'
@@ -129,6 +139,31 @@ end
 #   group node['ado-agent']['agent-user']
 #   recursive true
 # end
+
+remote_file node['azcli_file'] do
+  source node['azcli_url']
+  action :create
+end
+
+rpm_package 'azure-cli' do
+  package_name 'azure-cli'
+  source       node['azcli_file']
+end
+
+remote_file node['authV2_file'] do
+  source node['authV2_url']
+  action :create
+end
+
+execute 'install-authV2-extension' do
+  command [
+    'az',
+    'extension',
+    'add',
+    "--source #{node['authV2_file']}"
+  ].join(' ')
+  user node['ado-agent']['agent-user']
+end
 
 execute 'configure-ado-agent' do
   command [
