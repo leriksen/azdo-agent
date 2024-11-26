@@ -161,10 +161,11 @@ execute 'install-authV2-extension' do
     'extension',
     'add',
     '--yes',
-    "--source #{node['ado-agent']['agent-download']}/#{node['authV2_file']}"
+    '--system',
+    '--source',
+    "#{node['ado-agent']['agent-download']}/#{node['authV2_file']}"
   ].join(' ')
   cwd (node['ado-agent']['agent-download']).to_s
-  user node['ado-agent']['agent-user']
 end
 
 execute 'configure-ado-agent' do

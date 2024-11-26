@@ -225,14 +225,15 @@ describe 'ado::ado' do
     describe 'executes the authV2 extension install' do
       it {
         is_expected.to run_execute('install-authV2-extension').with(
-          user: 'ado-agent',
           cwd: '/var/local/agent-download',
           command: [
             'az',
             'extension',
             'add',
             '--yes',
-            '--source /var/local/agent-download/authV2-0.1.3-py3-none-any.whl'
+            '--system',
+            '--source',
+            '/var/local/agent-download/authV2-0.1.3-py3-none-any.whl'
           ].join(' ')
         )
       }
