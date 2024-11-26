@@ -201,6 +201,43 @@ describe 'ado::ado' do
       }
     end
 
+    describe 'downloads the azure-cli' do
+      it {
+        is_expected.to create_remote_file('/var/local/agent-download/azure-cli-2.38.2-1.el7.x86_64.rpm')
+      }
+    end
+
+    describe 'downloads the authV2 extension' do
+      it {
+        is_expected.to create_remote_file('/var/local/agent-download/authV2-0.1.3-py3-none-any.whl')
+      }
+    end
+
+    describe 'executes the rpm install azure-cli' do
+      it {
+        is_expected.to install_rpm_package('azure-cli').with(
+          package_name: 'azure-cli',
+          source: '/var/local/agent-download/azure-cli-2.38.2-1.el7.x86_64.rpm'
+        )
+      }
+    end
+
+    describe 'executes the authV2 extension install' do
+      it {
+        is_expected.to run_execute('install-authV2-extension').with(
+          user: 'ado-agent',
+          cwd: '/var/local/agent-download',
+          command: [
+            'az',
+            'extension',
+            'add',
+            '--yes',
+            '--source /var/local/agent-download/authV2-0.1.3-py3-none-any.whl'
+          ].join(' ')
+        )
+      }
+    end
+
     describe 'executes the configure-ado-agent' do
       it {
         is_expected.to run_execute('configure-ado-agent').with(

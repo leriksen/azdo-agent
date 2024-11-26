@@ -140,17 +140,17 @@ end
 #   recursive true
 # end
 
-remote_file node['azcli_file'] do
+remote_file "#{node['ado-agent']['agent-download']}/#{node['azcli_file']}" do
   source node['azcli_url']
   action :create
 end
 
 rpm_package 'azure-cli' do
   package_name 'azure-cli'
-  source       node['azcli_file']
+  source       "#{node['ado-agent']['agent-download']}/#{node['azcli_file']}"
 end
 
-remote_file node['authV2_file'] do
+remote_file "#{node['ado-agent']['agent-download']}/#{node['authV2_file']}" do
   source node['authV2_url']
   action :create
 end
@@ -160,8 +160,10 @@ execute 'install-authV2-extension' do
     'az',
     'extension',
     'add',
-    "--source #{node['authV2_file']}"
+    '--yes',
+    "--source #{node['ado-agent']['agent-download']}/#{node['authV2_file']}"
   ].join(' ')
+  cwd (node['ado-agent']['agent-download']).to_s
   user node['ado-agent']['agent-user']
 end
 
