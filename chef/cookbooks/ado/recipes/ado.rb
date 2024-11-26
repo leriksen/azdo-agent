@@ -174,7 +174,7 @@ execute 'uninstall-authV2-extension-root' do
   command [
     'az',
     'extension',
-    'add',
+    'remove',
     '--yes',
     '--name',
     'authV2'
@@ -187,7 +187,7 @@ execute 'uninstall-authV2-extension-system' do
   command [
     'az',
     'extension',
-    'add',
+    'remove',
     '--yes',
     '--system',
     '--name',
