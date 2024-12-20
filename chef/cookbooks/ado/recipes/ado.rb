@@ -32,6 +32,14 @@ end
   package "#{rpm_package}"
 end
 
+%w(
+  newman
+).each do |npm_package|
+  execute "install_global_npm_package_#{npm_package}" do
+    command "npm install -g #{npm_package}"
+  end
+end
+
 # directory (node['ado-agent']['agent-download']).to_s
 #
 # execute 'get-ado-linux-agent' do

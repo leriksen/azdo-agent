@@ -70,6 +70,19 @@ describe 'ado::ado' do
       end
     end
 
+    packages = %w(
+      newman
+    )
+    packages.each do |package|
+      describe "executes npm install global package #{package}" do
+        it {
+          is_expected.to run_execute("install_global_npm_package_#{package}").with(
+            command: "npm install -g #{package}"
+          )
+        }
+      end
+    end
+
     #     describe 'creates directory for agent download' do
     #       it { is_expected.to create_directory('/var/local/agent-download') }
     #     end
