@@ -5,6 +5,7 @@ module "globals" {
 locals {
   env_sub = {
     dev = "NP"
+    prd = "P"
   }
 }
 

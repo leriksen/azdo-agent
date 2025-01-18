@@ -12,6 +12,11 @@ output location {
 
 output "ado_control_ports" {
   value = [
-    "22",  # SSH
+    "8080",
+    "8081",
+    "80",
+    "443",
+    "1443",
+    "22"
   ]
 }
