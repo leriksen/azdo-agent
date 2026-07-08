@@ -7,7 +7,7 @@ $AdoOrgUrl = "$(System.CollectionUri)"
 $PoolName  = $env:POOLNAME
 
 $headers = @{
-    'Authorization' = "Bearer $(ADO_TOKEN)"
+    'Authorization' = "Bearer $(System.AccessToken)"
     'Content-Type'  = 'application/json'
 }
 
