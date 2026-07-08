@@ -41,6 +41,13 @@ $offline = @(
         Sort-Object -Unique
 )
 
+$disabled = @(
+    $agents |
+        Where-Object { $_.enabled -ne $true } |
+        Select-Object -ExpandProperty name |
+        Sort-Object -Unique
+)
+
 $matrix = [ordered]@{}
 for ($i = 0; $i -lt $online.Count; $i++) {
     $matrix["agent_$($i + 1)"] = @{ agentName = $online[$i] }
@@ -50,8 +57,15 @@ $onlineAgents = $matrix | ConvertTo-Json -Compress -Depth 10
 $onlineCount = $online.Count
 $offlineCount = $offline.Count
 $offlineNames = $offline -join ', '
+$disabledCount = $disabled.Count
+$disabledNames = $disabled -join ', '
 
 Write-Host "Online agents: $onlineCount"
+Write-Host "Disabled agents: $disabledCount"
+
+if ($disabledCount -gt 0) {
+    Write-Host "##vso[task.logissue type=warning]Some agents are disabled (manually excluded from jobs): $disabledNames"
+}
 
 if ($offlineCount -gt 0) {
     Write-Host "##vso[task.logissue type=error]Some agents are offline: $offlineNames"
@@ -65,3 +79,5 @@ if ($onlineAgents -eq '{}') {
 
 Write-Host "##vso[task.setvariable variable=ONLINE_AGENTS;isOutput=true]$onlineAgents"
 Write-Host "##vso[task.setvariable variable=AGENT_ONLINE_COUNT;isOutput=true]$onlineCount"
+Write-Host "##vso[task.setvariable variable=DISABLED_AGENTS;isOutput=true]$disabledNames"
+Write-Host "##vso[task.setvariable variable=AGENT_DISABLED_COUNT;isOutput=true]$disabledCount"
