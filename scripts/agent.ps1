@@ -27,44 +27,47 @@ $agentsResponse = Invoke-RestMethod -Method Get -Headers $headers `
 
 $agents = @($agentsResponse.value)
 
-$online = @(
+# Online + enabled: eligible for jobs, these become the matrix.
+$enabled = @(
     $agents |
-        Where-Object { $_.enabled -eq $true -and "$($_.status)".ToLower() -eq 'online' } |
+        Where-Object { "$($_.status)".ToLower() -eq 'online' -and $_.enabled -eq $true } |
         Select-Object -ExpandProperty name |
         Sort-Object -Unique
 )
 
-$offline = @(
-    $agents |
-        Where-Object { $_.enabled -eq $true -and "$($_.status)".ToLower() -ne 'online' } |
-        Select-Object -ExpandProperty name |
-        Sort-Object -Unique
-)
-
+# Online but manually disabled: running, but excluded from receiving jobs.
 $disabled = @(
     $agents |
-        Where-Object { $_.enabled -ne $true } |
+        Where-Object { "$($_.status)".ToLower() -eq 'online' -and $_.enabled -ne $true } |
+        Select-Object -ExpandProperty name |
+        Sort-Object -Unique
+)
+
+# Offline: not reachable, regardless of enabled flag.
+$offline = @(
+    $agents |
+        Where-Object { "$($_.status)".ToLower() -ne 'online' } |
         Select-Object -ExpandProperty name |
         Sort-Object -Unique
 )
 
 $matrix = [ordered]@{}
-for ($i = 0; $i -lt $online.Count; $i++) {
-    $matrix["agent_$($i + 1)"] = @{ agentName = $online[$i] }
+for ($i = 0; $i -lt $enabled.Count; $i++) {
+    $matrix["agent_$($i + 1)"] = @{ agentName = $enabled[$i] }
 }
 
-$onlineAgents = $matrix | ConvertTo-Json -Compress -Depth 10
-$onlineCount = $online.Count
-$offlineCount = $offline.Count
-$offlineNames = $offline -join ', '
+$enabledAgents = $matrix | ConvertTo-Json -Compress -Depth 10
+$enabledCount  = $enabled.Count
 $disabledCount = $disabled.Count
 $disabledNames = $disabled -join ', '
+$offlineCount  = $offline.Count
+$offlineNames  = $offline -join ', '
 
-Write-Host "Online agents: $onlineCount"
+Write-Host "Enabled agents: $enabledCount"
 Write-Host "Disabled agents: $disabledCount"
 
 if ($disabledCount -gt 0) {
-    Write-Host "##vso[task.logissue type=warning]Some agents are disabled (manually excluded from jobs): $disabledNames"
+    Write-Host "##vso[task.logissue type=warning]Some agents are online but disabled (manually excluded from jobs): $disabledNames"
 }
 
 if ($offlineCount -gt 0) {
@@ -72,12 +75,12 @@ if ($offlineCount -gt 0) {
     exit 1
 }
 
-if ($onlineAgents -eq '{}') {
-    Write-Host "##vso[task.logissue type=error]No online agents found in pool"
+if ($enabledAgents -eq '{}') {
+    Write-Host "##vso[task.logissue type=error]No enabled agents found in pool"
     exit 1
 }
 
-Write-Host "##vso[task.setvariable variable=ONLINE_AGENTS;isOutput=true]$onlineAgents"
-Write-Host "##vso[task.setvariable variable=AGENT_ONLINE_COUNT;isOutput=true]$onlineCount"
+Write-Host "##vso[task.setvariable variable=ENABLED_AGENTS;isOutput=true]$enabledAgents"
+Write-Host "##vso[task.setvariable variable=AGENT_ENABLED_COUNT;isOutput=true]$enabledCount"
 Write-Host "##vso[task.setvariable variable=DISABLED_AGENTS;isOutput=true]$disabledNames"
 Write-Host "##vso[task.setvariable variable=AGENT_DISABLED_COUNT;isOutput=true]$disabledCount"
